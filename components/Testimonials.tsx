@@ -7,6 +7,10 @@ import { Star, Quote, ChevronLeft, ChevronRight } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { testimonials, site } from "../lib/site";
 import { Reveal } from "./motion/Reveal";
+import { useReviews } from "./useReviews";
+import GoogleReviewsWidget, {
+  reviewsWidgetEnabled,
+} from "./GoogleReviewsWidget";
 
 const reviewLinks = [
   { label: "Read Google Reviews", href: site.reviews.google },
@@ -15,10 +19,29 @@ const reviewLinks = [
 ].filter((l) => l.href);
 
 export default function Testimonials() {
+  const live = useReviews();
+  const list = live?.reviews?.length
+    ? live.reviews.map((r, i) => ({
+        name: r.name,
+        location: r.relativeTime ?? "Google",
+        avatar: r.avatar ?? `/images/guest-${(i % 6) + 1}.jpg`,
+        rating: r.rating,
+        source: "Google" as const,
+        quote: r.text,
+      }))
+    : testimonials;
+  const rating = live?.rating ?? 4.8;
+  const reviewCount = live?.count ?? 19;
+
+  // Show the live widget while it loads; fall back to the curated carousel
+  // if it fails (offline, blocked, or trial expired).
+  const [widgetFailed, setWidgetFailed] = useState(false);
+  const showCarousel = !reviewsWidgetEnabled || widgetFailed;
+
   const [[page, dir], setPage] = useState<[number, number]>([0, 0]);
-  const count = testimonials.length;
+  const count = list.length;
   const active = ((page % count) + count) % count;
-  const t = testimonials[active];
+  const t = list[active];
 
   const paginate = useCallback((d: number) => setPage(([p]) => [p + d, d]), []);
 
@@ -38,8 +61,21 @@ export default function Testimonials() {
             Guest Stories
           </h2>
           <div className="divider-accent mx-auto mt-5" />
+          <p className="mt-4 inline-flex items-center justify-center gap-2 text-sm font-medium text-muted">
+            <Star className="h-4 w-4 fill-accent text-accent" />
+            {rating.toFixed(1)} · {reviewCount}+ Google reviews
+          </p>
         </Reveal>
 
+        {/* Real-time Google reviews widget (auto-updates, no code edits). */}
+        {reviewsWidgetEnabled && !widgetFailed && (
+          <GoogleReviewsWidget
+            onStatus={(s) => s === "failed" && setWidgetFailed(true)}
+          />
+        )}
+
+        {showCarousel && (
+          <>
         <Reveal className="mt-12">
           <div className="relative overflow-hidden rounded-3xl border border-border bg-surface p-8 shadow-xl sm:p-12">
             <Quote className="absolute right-8 top-8 h-16 w-16 text-primary/10" />
@@ -95,9 +131,9 @@ export default function Testimonials() {
             <ChevronLeft className="h-5 w-5" />
           </button>
           <div className="flex gap-1.5">
-            {testimonials.map((item, i) => (
+            {list.map((item, i) => (
               <button
-                key={item.name}
+                key={`${item.name}-${i}`}
                 type="button"
                 aria-label={`Go to testimonial ${i + 1}`}
                 onClick={() => setPage([i, i > active ? 1 : -1])}
@@ -116,6 +152,8 @@ export default function Testimonials() {
             <ChevronRight className="h-5 w-5" />
           </button>
         </div>
+          </>
+        )}
 
         {reviewLinks.length > 0 && (
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">

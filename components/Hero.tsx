@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, type Variants } from "framer-motion";
 import { Star, MapPin, ArrowRight, Wind, ChefHat, Landmark, ChevronDown } from "lucide-react";
 import { site } from "../lib/site";
+import { useReviews } from "./useReviews";
 
 const quickAmenities = [
   { icon: Wind, label: "AC Rooms" },
@@ -36,6 +37,9 @@ const embers = [
 ];
 
 export default function Hero() {
+  const reviews = useReviews();
+  const rating = reviews?.rating ?? 4.8;
+  const count = reviews?.count ?? 19;
   return (
     <section
       id="home"
@@ -143,7 +147,9 @@ export default function Hero() {
               <Star key={i} className="h-4 w-4 fill-accent text-accent" />
             ))}
           </span>
-          <span>4.8 · Rated by 19+ guests on Google</span>
+          <span>
+            {rating.toFixed(1)} · Rated by {count}+ guests on Google
+          </span>
         </motion.div>
 
         <motion.h1
