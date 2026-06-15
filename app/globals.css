@@ -1,0 +1,431 @@
+@import "tailwindcss";
+
+/* Enable class-based dark mode for Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------
+   Design tokens — Light theme (default)
+   Warm whites, stone backgrounds, natural greens, amber highlights
+----------------------------------------------------------------*/
+:root {
+  --background: #faf8f4;
+  --surface: #ffffff;
+  --surface-muted: #f4f1ea;
+  --foreground: #1c2620;
+  --muted: #5b6660;
+  --border: #e6e1d6;
+
+  --primary: #1f6f54;        /* natural forest green */
+  --primary-hover: #185a44;
+  --accent: #c79a3a;         /* warm amber/gold */
+  --accent-hover: #b1862c;
+  --ring: rgba(31, 111, 84, 0.4);
+
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --shadow-color: 28 38 32;
+}
+
+/* ---------------------------------------------------------------
+   Dark theme — Deep charcoal, forest greens, elegant gold
+----------------------------------------------------------------*/
+.dark {
+  --background: #0e1311;
+  --surface: #161d1a;
+  --surface-muted: #1b231f;
+  --foreground: #eef2ef;
+  --muted: #9aa8a0;
+  --border: #283430;
+
+  --primary: #3fae84;
+  --primary-hover: #4cc295;
+  --accent: #e3b85a;
+  --accent-hover: #f0c870;
+  --ring: rgba(63, 174, 132, 0.45);
+
+  --glass-bg: rgba(18, 24, 21, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --shadow-color: 0 0 0;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-serif: var(--font-display), "Cormorant Garamond", Georgia, "Times New Roman", serif;
+}
+
+/* ---------------------------------------------------------------
+   Base
+----------------------------------------------------------------*/
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+/* Royal serif display for all headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-display {
+  font-family: var(--font-serif);
+  letter-spacing: -0.015em;
+  font-feature-settings: "liga" 1, "kern" 1;
+}
+
+/* Smooth theme transition — applied only to colors to avoid layout jank */
+body,
+body * {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  body,
+  body * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Utilities
+----------------------------------------------------------------*/
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: saturate(180%) blur(14px);
+  -webkit-backdrop-filter: saturate(180%) blur(14px);
+  border: 1px solid var(--glass-border);
+}
+
+.text-gradient {
+  background: linear-gradient(120deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Elegant focus ring for accessibility */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--surface-muted);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 6px;
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.animate-float-slow {
+  animation: float-slow 6s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
+/* ---------------------------------------------------------------
+   Premium interactions — link underlines, glows & shine
+----------------------------------------------------------------*/
+
+/* Animated gradient underline that grows from the left on hover */
+.nav-link {
+  position: relative;
+  transition: color 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 4px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.nav-link:hover::after,
+.nav-link:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* Underline animation for inline / footer links */
+.link-underline {
+  position: relative;
+  display: inline-block;
+  background-image: linear-gradient(90deg, var(--accent), var(--accent));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1.5px;
+  transition: color 0.35s ease, background-size 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.link-underline:hover,
+.link-underline:focus-visible {
+  color: var(--primary);
+  background-size: 100% 1.5px;
+}
+
+/* Glowing lift effect for cards & buttons */
+.hover-lift {
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+.hover-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px -12px rgba(var(--shadow-color), 0.45);
+}
+
+/* Shine sweep that crosses a button on hover */
+.btn-shine {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.btn-shine::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  transform: translateX(-120%) skewX(-20deg);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.45),
+    transparent
+  );
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.btn-shine:hover::before {
+  transform: translateX(120%) skewX(-20deg);
+}
+
+/* Soft pulsing glow for primary call-to-action emphasis */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(199, 154, 58, 0.45); }
+  50% { box-shadow: 0 0 0 12px rgba(199, 154, 58, 0); }
+}
+.animate-glow {
+  animation: glow-pulse 2.6s ease-in-out infinite;
+}
+
+/* Aurora mesh — slowly drifting luminous blobs */
+@keyframes aurora-drift {
+  0%   { transform: translate3d(-6%, -4%, 0) scale(1); }
+  33%  { transform: translate3d(5%, 3%, 0) scale(1.15); }
+  66%  { transform: translate3d(-3%, 6%, 0) scale(0.95); }
+  100% { transform: translate3d(-6%, -4%, 0) scale(1); }
+}
+.animate-aurora {
+  animation: aurora-drift 18s ease-in-out infinite;
+}
+.animate-aurora-slow {
+  animation: aurora-drift 26s ease-in-out infinite reverse;
+}
+
+/* Shimmering gold sweep across text */
+.text-shimmer {
+  background: linear-gradient(
+    100deg,
+    var(--accent) 20%,
+    #fff3cf 38%,
+    #ffffff 50%,
+    #fff3cf 62%,
+    var(--accent) 80%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: text-shimmer 5s linear infinite;
+}
+@keyframes text-shimmer {
+  to { background-position: 200% center; }
+}
+
+/* Floating gold embers/particles rising slowly */
+@keyframes ember-rise {
+  0%   { transform: translateY(0) scale(1); opacity: 0; }
+  10%  { opacity: 0.9; }
+  90%  { opacity: 0.7; }
+  100% { transform: translateY(-90vh) scale(0.6); opacity: 0; }
+}
+.animate-ember {
+  animation: ember-rise linear infinite;
+}
+
+/* Gradient glow ring that fades in on card hover */
+.card-glow {
+  position: relative;
+}
+.card-glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(135deg, var(--primary), var(--accent), var(--primary));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+          mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  pointer-events: none;
+}
+.card-glow:hover::after {
+  opacity: 1;
+}
+
+/* Diagonal light sheen that sweeps across an image when its `group` parent is hovered.
+   Apply to a relatively/absolutely positioned, overflow-hidden image wrapper. */
+.img-sheen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+.img-sheen::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transform: skewX(-20deg);
+  transition: left 0.75s ease;
+}
+.group:hover .img-sheen::after {
+  left: 130%;
+}
+
+/* Shimmering gradient divider used under section eyebrows */
+.divider-accent {
+  height: 2px;
+  width: 56px;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  background-size: 200% auto;
+  animation: text-shimmer 4s linear infinite;
+}
+
+/* Slow vertical drift for ambient section glow blobs */
+@keyframes blob-float {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(0, -24px, 0) scale(1.08); }
+}
+.animate-blob {
+  animation: blob-float 12s ease-in-out infinite;
+}
+
+/* Dramatic media zoom on hover — parent must carry the `group` class.
+   Adds a smooth scale plus a richer saturation/brightness pop. */
+.media-zoom {
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1), filter 0.8s ease;
+  will-change: transform;
+}
+.group:hover .media-zoom {
+  transform: scale(1.14);
+  filter: saturate(1.25) brightness(1.06);
+}
+
+/* Colored brand-gradient wash that fades over media on hover */
+.media-wash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(63, 174, 132, 0.35) 0%,
+    transparent 45%,
+    rgba(199, 154, 58, 0.42) 100%
+  );
+  transition: opacity 0.5s ease;
+  z-index: 1;
+}
+.group:hover .media-wash {
+  opacity: 1;
+}
+
+/* Expanding pulse rings behind the video play button on hover */
+@keyframes ring-pulse {
+  0%   { transform: scale(0.9); opacity: 0.7; }
+  100% { transform: scale(2);  opacity: 0; }
+}
+.play-ring::before,
+.play-ring::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 9999px;
+  border: 2px solid rgba(255, 255, 255, 0.65);
+  opacity: 0;
+  pointer-events: none;
+}
+.group:hover .play-ring::before {
+  animation: ring-pulse 1.8s ease-out infinite;
+}
+.group:hover .play-ring::after {
+  animation: ring-pulse 1.8s ease-out infinite 0.9s;
+}
